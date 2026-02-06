@@ -14,21 +14,23 @@ theme_set(theme_classic(12))
 ```
 
 ```{r, message=FALSE}
+# Import fish survey data 
 fish <- read_csv(here("data", "MCR_LTER_Annual_Fish_Survey_20250324.csv")) |> 
   janitor::clean_names()
 ```
 
 ```{r, message=FALSE}
+# Summing observations from backreef sites relative to functional groups in 2006 
 fish_2006 <- fish |> 
-  group_by(fine_trophic, habitat) |> 
-  filter(fine_trophic != "na")|> 
-  filter(year == "2006") |> 
-  filter(habitat == "Backreef") |> 
+  group_by(fine_trophic) |> 
+  filter(fine_trophic != "na", 
+         year == "2006", 
+         habitat == "Backreef") |> 
   summarise(n = n()) |> 
   mutate(total_number = n) |> 
   arrange(desc(total_number))
           
-          
+# Create 2006 functional group plot          
 fish_2006_plot <- ggplot(fish_2006, aes(x = total_number, 
                       y = reorder(fine_trophic, +total_number), 
                       fill = fine_trophic)) +
@@ -39,15 +41,17 @@ fish_2006_plot <- ggplot(fish_2006, aes(x = total_number,
        x = "Count") +
   theme(legend.position = "none")
 
+# Summing observations from backreef sites relative to functional groups in 2024
 fish_2024 <- fish |> 
-  group_by(fine_trophic, habitat) |> 
-  filter(fine_trophic != "na")|> 
-  filter(year == "2024") |> 
-  filter(habitat == "Backreef") |> 
+  group_by(fine_trophic) |> 
+  filter(fine_trophic != "na", 
+         year == "2024", 
+         habitat == "Backreef") |> 
   summarise(n = n()) |> 
   mutate(total_number = n) |> 
   arrange(desc(total_number))
 
+# Create 2024 functional group plot
 fish_2024_plot <- ggplot(fish_2024, aes(x = total_number, 
                       y = reorder(fine_trophic, +total_number), 
                       fill = fine_trophic)) +
@@ -63,15 +67,18 @@ fish_2024_plot
 ```
 
 ```{r, message=FALSE}
+# Filter for 4 groups, sum their observations per year in backreef locations
 functional_through_years <- fish |> 
   group_by(year, fine_trophic) |> 
-  filter(habitat == "Backreef") |> 
-  filter(fine_trophic %in% c("Corallivore", "Brusher", "Scraper", "Excavator")) |> 
+  filter(habitat == "Backreef", 
+         fine_trophic %in% c("Corallivore", "Brusher", "Scraper", "Excavator")) |> 
   summarise(n = n()) |> 
   mutate(total_number = n)
 
+# Custom palette for different functional groups
 palette <- c("Brusher" =  "#264653","Corallivore"=  "#2A9D8F", "Excavator" = "#E9C46A", "Scraper" = "#E76F51")
-  
+
+# Plot 
 group_plot <- ggplot(functional_through_years, 
        aes(x = year, 
            y = total_number, 
