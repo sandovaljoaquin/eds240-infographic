@@ -5,20 +5,20 @@ editor: visual
 author: Joaquin Sandoval 
 date: 2/4/2026
 ---
-
+### Necessary Libraries 
 ```{r, message= FALSE}
 library(tidyverse)
 library(here)
 library(janitor)
 theme_set(theme_classic(12))
 ```
-
+### Data Import 
 ```{r, message=FALSE}
 # Import fish survey data 
 fish <- read_csv(here("data", "MCR_LTER_Annual_Fish_Survey_20250324.csv")) |> 
   janitor::clean_names()
 ```
-
+### Comparing Functional Group Abundance in 2006 and 2024 at Backreef sites
 ```{r, message=FALSE}
 # Summing observations from backreef sites relative to functional groups in 2006 
 fish_2006 <- fish |> 
@@ -65,7 +65,7 @@ fish_2024_plot <- ggplot(fish_2024, aes(x = total_number,
 fish_2006_plot 
 fish_2024_plot
 ```
-
+### Visualizing Decline of Corallivores/Brushers & Increase in Excavators/Scrapers at Backreef sites
 ```{r, message=FALSE}
 # Filter for 4 groups, sum their observations per year in backreef locations
 functional_through_years <- fish |> 
@@ -95,6 +95,8 @@ group_plot <- ggplot(functional_through_years,
 
 group_plot
 ```
+
+### Questions 
 
 1.  What have you learned about your data? Have any potentially interesting patterns emerged? Point to specific visualizations that you created as you describe your findings.
 
