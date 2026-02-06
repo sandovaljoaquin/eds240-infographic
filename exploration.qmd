@@ -1,0 +1,112 @@
+---
+title: "Exploration"
+format: html
+editor: visual
+author: Joaquin Sandoval 
+date: 2/4/2026
+---
+
+```{r, message= FALSE}
+library(tidyverse)
+library(here)
+library(janitor)
+theme_set(theme_classic(12))
+```
+
+```{r, message=FALSE}
+fish <- read_csv(here("data", "MCR_LTER_Annual_Fish_Survey_20250324.csv")) |> 
+  janitor::clean_names()
+```
+
+```{r, message=FALSE}
+fish_2006 <- fish |> 
+  group_by(fine_trophic, habitat) |> 
+  filter(fine_trophic != "na")|> 
+  filter(year == "2006") |> 
+  filter(habitat == "Backreef") |> 
+  summarise(n = n()) |> 
+  mutate(total_number = n) |> 
+  arrange(desc(total_number))
+          
+          
+fish_2006_plot <- ggplot(fish_2006, aes(x = total_number, 
+                      y = reorder(fine_trophic, +total_number), 
+                      fill = fine_trophic)) +
+  geom_col() + 
+  ylab(" ") + 
+  xlab("Count") + 
+  labs(title = " 2006 Backreef Fish Abundance by Group", 
+       x = "Count") +
+  theme(legend.position = "none")
+
+fish_2024 <- fish |> 
+  group_by(fine_trophic, habitat) |> 
+  filter(fine_trophic != "na")|> 
+  filter(year == "2024") |> 
+  filter(habitat == "Backreef") |> 
+  summarise(n = n()) |> 
+  mutate(total_number = n) |> 
+  arrange(desc(total_number))
+
+fish_2024_plot <- ggplot(fish_2024, aes(x = total_number, 
+                      y = reorder(fine_trophic, +total_number), 
+                      fill = fine_trophic)) +
+  geom_col() + 
+  ylab(" ") + 
+  xlab("Count") + 
+  labs(title = " 2024 Backreef Fish Abundance by Group", 
+       x = "Count") +
+  theme(legend.position = "none")
+
+fish_2006_plot 
+fish_2024_plot
+```
+
+```{r, message=FALSE}
+functional_through_years <- fish |> 
+  group_by(year, fine_trophic) |> 
+  filter(habitat == "Backreef") |> 
+  filter(fine_trophic %in% c("Corallivore", "Brusher", "Scraper", "Excavator")) |> 
+  summarise(n = n()) |> 
+  mutate(total_number = n)
+
+palette <- c("Brusher" =  "#264653","Corallivore"=  "#2A9D8F", "Excavator" = "#E9C46A", "Scraper" = "#E76F51")
+  
+group_plot <- ggplot(functional_through_years, 
+       aes(x = year, 
+           y = total_number, 
+           color = fine_trophic)) + 
+  geom_line() + 
+  geom_vline(xintercept = 2012, linetype = "dashed") + 
+  scale_color_manual(values = palette) + 
+  annotate("text", x = 2012, y = max(functional_through_years$total_number), 
+         label = "Inflection point", angle = 90, vjust = -0.5, hjust = 1) + 
+  labs(x = "Year", 
+    y = "Count", 
+    title = "Backreef Functional Group Abundance Change (2006-2024)", 
+    color = "Functional Group")
+
+group_plot
+```
+
+1.  What have you learned about your data? Have any potentially interesting patterns emerged? Point to specific visualizations that you created as you describe your findings.
+
+    Fish functional groups that interact with the benthos have shifted over time. From 2006 to 2024, scrapers and excavators increased in abundance while corallivores and brushers declined (Figures 1 and 2). An inflection point around in the early 2010s marks where these opposing trends diverge (Figure 3). Coral cover decline may be driving both patterns, favoring groups that graze algae covered substrate over those dependent on live coral.
+
+2.  In [FPM #1](https://eds-240-data-viz.github.io/course-materials/assignments/FPM1.html), you outlined some questions that you wanted to answer using these data. Have you made any strides towards answering those questions? If yes, how so? If no, what next steps do you need to take (e.g. I need to create X plot type, I still need to track down Y data, I need to restructure existing data so that you can visualize it in Z ways, etc.)? Have any new questions emerged?
+
+    I've somewhat visualized some answers to these questions:
+
+    -   How have fish communities changed since onset of data collection? I've shown communities in 2004 and 2024.
+
+    -   Have certain groups become more prominent? Scrapers/Excavators
+
+    -   Have certain groups become less prominent? Corallivores/Brushers
+
+    I would need to do some further investigation to answer:
+
+    -   Does this vary across sites? Habitat?
+
+3.  What challenges do you foresee encountering with your data? These can be data wrangling and / or visualization challenges.
+
+    Potentially finding more interesting ways to display these visuals. I think I'd like to use some kind of spatial aspect or reference sites around the island. As of now, these are just trends in one habitat grouped all together.
