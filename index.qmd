@@ -13,7 +13,6 @@ Coral reefs are among the most biodiverse ecosystems on Earth, yet they are disa
 
 ```{r}
 #| echo: false
-#| out-width: "80%"
 knitr::include_graphics("infographic.png")
 ```
 
