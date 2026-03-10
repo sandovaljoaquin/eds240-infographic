@@ -10,7 +10,7 @@ code-fold: true
 
 Coral reefs are among the most biodiverse ecosystems on Earth, yet they are disappearing at an unprecedented rate. The Anthropocene has driven large-scale phase shifts on reefs worldwide — transitions from coral-dominated to macroalgae-dominated states that fundamentally alter ecosystem structure and function. At Mo'orea's LTER 1 backreef in French Polynesia, *Turbinaria ornata*, a canopy-forming brown macroalgae well-defended against herbivory, has emerged as a dominant benthic organism following decades of disturbance. As coral cover declines, how do fish communities respond when the foundation of their habitat disappears? Using long-term monitoring data from the MCR LTER (Moorea Coral Reef Long Term Ecological Research site, ongoing since 2005), this infographic tracks benthic cover and fish functional group abundance from 2006 to 2024. Together, these data reveal which functional groups thrive and which suffer as Mo'orea's backreef undergoes a fundamental transformation.
 
-![](FPM5.png)
+![](infographic.png)
 
 ### Approach and decisions for 10 design elements
 
@@ -35,9 +35,13 @@ The line plot tracks benthic cover over time, with a phase shift annotation mark
 
 10. **DEI Lens**: The location of this data is named accurately throughout. Reef degradation is framed as Anthropocene-driven rather than a natural or neutral process, acknowledging human responsibility. The introduction is written to be accessible to a general audience, not just marine ecologists.
 
+The following code used to make the visuals in the infographic can be accsessed here: 
+
 ```{r}
 #| message: false
 #| warning: false
+#| eval: false
+#| echo: true
 
 library(tidyverse)
 
