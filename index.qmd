@@ -1,5 +1,5 @@
 ---
-title: "FPM4"
+title: "EDS 240 Infographic"
 author: "Joaquin Sandoval"
 format: html
 editor: visual
@@ -47,6 +47,7 @@ The following code used to make the visuals in the infographic can be accsessed 
 #| echo: true
 
 library(tidyverse)
+library(ggtext)
 
 fish <- read_csv(here::here("data", "MCR_LTER_Annual_Fish_Survey_20250324.csv")) |> 
   janitor::clean_names()
@@ -73,41 +74,35 @@ joined_cover <- left_join(coral_cover, macroalgae_cover) |> pivot_longer(cols = 
 
 # Plot benthos cover graph 
 
-ggplot(joined_cover, aes(x = year, y = cover, color = type)) + 
+benthic_plot <- ggplot(joined_cover, aes(x = year, y = cover, color = type)) + 
   geom_line(linewidth = 1.8) + 
-  # phase shift annotation
   geom_vline(xintercept = 2014, linetype = "dashed", color = "grey40", linewidth = 0.5) +
   annotate("text", x = 2014.3, y = 42, label = "Phase shift", 
-           hjust = 0, color = "grey30", size = 4, fontface = "italic") +
-  # direct line labels instead of legend
+           hjust = 0, color = "grey30", size = 6, fontface = "italic") +
   annotate("text", x = 2024, y = 24, label = "Macroalgae", 
-           color = "#009E73", hjust = 0, size = 4, fontface = "bold") +
+           color = "#009E73", hjust = 0, size = 6, fontface = "bold") +
   annotate("text", x = 2025, y = 11, label = "Coral", 
-           color = "#D55E00", hjust = 0, size = 4, fontface = "bold") +
-  # colorblind friendly colors
+           color = "#D55E00", hjust = 0, size = 6, fontface = "bold") +
   scale_color_manual(values = c("mean_site_algae_cover" = "#009E73",
-                                "mean_site_coral_cover" = "#D55E00"),
-                     labels = c("Macroalgae", "Coral")) +
-  # % labels on y axis
+                                "mean_site_coral_cover" = "#D55E00")) +
   scale_y_continuous(labels = scales::label_percent(scale = 1)) +
   scale_x_continuous(expand = expansion(mult = c(0.02, 0.12))) +
-  labs(title = "Macroalgae takes over LTER 1 backreef",
-       subtitle = "Macroalgae surpassed coral cover around 2014.",
-       caption = "Source: MCR LTER Long-term Community Dynamics, Backreef (Lagoon) Corals Annual Survey, ongoing since 2005", 
-       x = NULL, 
-       y = "Mean Cover", 
-       color = NULL) + 
+  labs(title = "Macroalgae Overtakes Coral",
+       subtitle = "Around 2014, coral dominance ended in Mo'orea's LTER 1 backreef,<br> driven by disturbance and *Turbinaria* persistence.",
+       x = NULL, y = "Mean Cover", color = NULL) + 
   theme_classic() +
   theme(
-    plot.title = element_text(face = "bold", size = 14),
-    plot.subtitle = element_text(color = "grey40", size = 10),
+    plot.title = element_text(face = "bold", size = 28),
+    plot.subtitle = element_markdown(size = 20, color = "grey40"),
     plot.title.position = "plot",
-    axis.text = element_text(size = 11),
-    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 16),
+    axis.title = element_text(size = 18),
     legend.position = "none", 
     plot.background = element_rect(fill = "transparent", color = NA),
     panel.background = element_rect(fill = "transparent", color = NA)
   )
+
+ggsave(here::here("img", "benthic_plot.png"), width = 10, height = 6, dpi = 300, bg = "transparent")
 
 # Summing observations from 2006 
 fish_2006 <- fish |> 
@@ -148,51 +143,50 @@ dumbbell_data <- fish_start |>
   filter(fine_trophic != "Benthic Invertebrate Consumer")
 
 # Dumbell plot of fish community change 
-ggplot(dumbbell_data |> 
-         filter(fine_trophic != "Omnivore"), aes(y = fine_trophic)) +
+
+dumbbell_plot <- ggplot(dumbbell_data |> 
+         filter(fine_trophic != "Omnivore", fine_trophic != "Concealed Cropper"), aes(y = fine_trophic)) +
   geom_segment(aes(x = start, xend = end, yend = fine_trophic), color = "grey60") +
   geom_point(aes(x = start, color = "#D55E00"), size = 4) +
   geom_point(aes(x = end, color = "#009E73"), size = 4) +
   geom_text(aes(x = (start + end) / 2,
                 label = ifelse(change > 0, paste0("+", change), as.character(change)),
-                color = ifelse(change > 0, "#009E73", "#D55E00")),
-            vjust = -1.2, size = 3, fontface = "bold") +
-  annotate("text", x = 8, y = 9.4, label = "2006",
-         color = "#D55E00", size = 3.5, fontface = "bold") +
-annotate("text", x = 31, y = 9.4, label = "2024",
-         color = "#009E73", size = 3.5, fontface = "bold") +
+                color = ifelse(change > 0, "green4", "red")),
+            vjust = -1.2, size = 4.5, fontface = "bold") +
   scale_color_identity() +
+  scale_y_discrete(labels = c("Herbivore/Detritivore" = "Herbivore"), limits = rev) +
   labs(x = "Number of fish observed",
        y = NULL,
-       title = "Coral loss reshapes the fish community at LTER 1",
-       subtitle = "Most functional groups declined between 2006 and 2024 at LTER 1 backreef",
-       caption = "MCR LTER Long-term Population and Community Dynamics: Fishes, ongoing since 2005") +
+       title = "Coral Loss Reshapes the Fish Community",
+       subtitle = "Most functional groups declined between <span style='color:#D55E00'>**2006**</span> and <span style='color:#009E73'>**2024**</span>.") +
   theme_classic() +
   theme(
     legend.position = "none",
-    plot.title = element_text(face = "bold", size = 13),
-    plot.subtitle = element_text(color = "grey40", size = 10),
+    plot.title = element_text(face = "bold", size = 24),
+    plot.subtitle = element_markdown(color = "grey40", size = 18),
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
     plot.title.position = "plot", 
     plot.background = element_rect(fill = "transparent", color = NA),
-    panel.background = element_rect(fill = "transparent", color = NA)
+    panel.background = element_rect(fill = "transparent", color = NA), 
+    axis.title.x = element_text(size = 16, margin = margin(t = 10))
   )
 
-# Custom palette for different functional groups
-palette <- c("Browser" = "#264653", "Corallivore" = "#2A9D8F", 
-             "Excavator" = "#E9C46A", "Scraper" = "#E76F51")
+ggsave(here::here("img", "dumbbell_plot.png"), width = 10, height = 6, dpi = 300, bg = "transparent")
 
+# Filter for 4 groups, sum their observations per year in backreef locations
 functional_through_years <- fish |> 
   group_by(year, fine_trophic) |> 
-  filter(site == "LTER_1", 
-         habitat == "Backreef", 
-         fine_trophic %in% c("Corallivore", "Browser", "Scraper", "Excavator")) |> 
+  filter(habitat == "Backreef", 
+         fine_trophic %in% c("Corallivore", "Brusher", "Scraper", "Excavator")) |> 
   summarise(n = n()) |> 
-  mutate(total_number = n, 
-         fine_trophic = factor(fine_trophic, 
-                                levels = c("Scraper", "Excavator", 
-                                           "Browser", "Corallivore")))
-# 4 most affected functional groups 
-ggplot(functional_through_years, 
+  mutate(total_number = n)
+
+# Custom palette for different functional groups
+palette <- c("Browser" = "#264653", "Corallivore" = "#E9C46A", 
+             "Excavator" = "#2A9D8F", "Scraper" = "#E76F51")
+
+functional_groups_plot<- ggplot(functional_through_years, 
        aes(x = year, y = total_number, color = fine_trophic)) + 
   facet_wrap(~fine_trophic, scales = "fixed") + 
   geom_line(linewidth = 1.2) +
@@ -201,22 +195,25 @@ ggplot(functional_through_years,
   scale_color_manual(values = palette) + 
   labs(x = NULL, 
        y = "Number of fish observed", 
-       title = "The most affected fish groups in a changing backreef",
-       subtitle = "Scrapers and Excavators thrive; Corallivores and Browsers decline",
-       caption = "MCR LTER Long-term Population and Community Dynamics: Fishes, ongoing since 2005") + 
+       title = "The Most Affected Functional Groups",
+       subtitle = "Scrapers and excavators thrive while corallivores and browsers decline,\n suggesting the community shift is more complex than dietary response.") +  
   theme_classic() +
   theme(
     legend.position = "none",
-    strip.text = element_text(face = "bold", size = 11),
-    strip.background = element_rect(fill = "grey95", color = NA),
-    axis.text = element_text(size = 10),
-    axis.title = element_text(size = 11),
-    plot.title = element_text(face = "bold", size = 13),
-    plot.subtitle = element_text(color = "grey40", size = 10),
+    strip.text = element_text(face = "bold", size = 16),
+    strip.background = element_rect(fill = "transparent", color = NA),
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 16),
+    plot.title = element_text(face = "bold", size = 24),
+    plot.subtitle = element_text(color = "grey40", size = 18),
+    plot.caption = element_text(size = 12),
     plot.title.position = "plot",
     panel.grid.minor = element_blank(), 
     plot.background = element_rect(fill = "transparent", color = NA),
-    panel.background = element_rect(fill = "transparent", color = NA
-  ))
+    panel.background = element_rect(fill = "transparent", color = NA)
+  )
+
+ggsave(here::here("img", "functional_groups_plot.png"), width = 10, height = 6, dpi = 300, bg = "transparent")
 
 ```
+
