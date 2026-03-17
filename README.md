@@ -13,7 +13,7 @@ Coral reefs worldwide are undergoing phase shifts from coral-dominated to macroa
 │   ├── MCR_LTER_Annual_Fish_Survey_20250324.csv                  # MCR LTER fish functional group data
 │   └── MCR_LTER_Coral_Cover_Backreef_Long_20260219.csv           # MCR LTER benthic cover data
 ├── img/
-│   ├── infographic.png                                           # FPM4 infographic
+│   ├── infographic.png                                           # Final infographic
 │   ├── benthic_plot.png                                          
 │   ├── dumbbell_plot.png         
 │   └── functional_groups_plot.png
